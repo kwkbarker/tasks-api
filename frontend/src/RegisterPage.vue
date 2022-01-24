@@ -1,0 +1,121 @@
+<template>
+  <div class="container">
+    <form 
+      class="form-register"
+      @submit.prevent="registerUser"
+    >
+      <div class='row row-content justify-content-center mt-2'>
+        <h1 class="h3 mb-3 font-weight-normal">
+          Register
+        </h1>
+      </div>
+      <br>
+      <div class='row row-content justify-content-center textfield'>
+       
+        <username-input 
+          name="Username"
+          :value="username.value"
+          type="text"
+          @inputEvent="update"
+        />
+
+        <username-input 
+          name="Email"
+          :value="email.value"
+          type="text"
+          @inputEvent="update"
+        />
+
+        <username-input 
+          name="Password"
+          :value="password.value"
+          type='password'
+          @inputEvent="update"
+        />
+
+        <username-input
+          name="Confirm Password"
+          :value="confirm.value"
+          type="password"
+          @inputEvent="update"
+        />
+      </div>
+
+      <div class="">
+        <button class="btn btn-primary" type="submit">Login</button>
+      </div>
+
+      <div class="row row-content justify-content-end col-sm-10 mt-4">
+        <h6>Already have an account?</h6>
+      </div>
+      <div class='row row-content justify-content-end col-sm-10'>
+        <router-link to="/login">Log in</router-link>
+      </div>
+    </form>
+  </div>
+
+</template>
+
+<script>
+import UsernameInput from './UsernameInput.vue'
+import axios from 'axios'
+
+export default {
+  components: { UsernameInput },
+  data() {
+    return {
+      username: {
+        value: '',
+      },
+      password: {
+        value: '',
+      },
+      confirm: {
+        value: '',
+      },
+      email: {
+        value: '',
+      },
+      message: {
+        value: '',
+        color: ''
+      }
+    }
+  },
+
+  methods: {
+    registerUser() {
+      console.log("register")
+
+      if (this.password != this.confirm) {
+        this.message = "Passwords must match."
+        this.color = 'danger'
+      }
+
+      const path = 'http://127.0.0.1:5000/api/register'
+      axios.post(path, {
+        username: this.username,
+        password: this.password,
+        email: this.email,
+        confirm: this.confirm
+      })
+      .then(response => {
+        console.log(response)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+    },
+
+    update(payload) {
+      this[payload.name] = {
+        value: payload.value,
+      }
+    }
+  },
+}
+</script>
+
+<style scoped>
+
+</style> 
