@@ -32,7 +32,8 @@ db.create_all()
 
 
 # enable CORS
-cors = CORS(app, resources={r'/*': {'origins': '*'}}, CORS_SUPPORTS_CREDENTIALS=True)
+cors = CORS(app)
+#, resources={r'/*': {'origins': '*'}}, CORS_SUPPORTS_CREDENTIALS=True
 app.config['CORS_HEADERS'] = 'Content-Type'
 logging.getLogger('flask_cors').level = logging.DEBUG
 
@@ -46,5 +47,9 @@ login_manager.init_app(app)
 
 app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
 admin = Admin(app, template_mode='bootstrap3')
+
+
+from todolist.routes import api
+app.register_blueprint(api, url_prefix="/api")
 
 from todolist import routes

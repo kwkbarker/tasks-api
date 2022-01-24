@@ -1,4 +1,5 @@
 from flask.globals import request
+from flask_cors import cross_origin
 from flask_login.utils import logout_user
 from sympy import re
 from todolist import app, db
@@ -11,6 +12,11 @@ import psycopg2
 from todolist.storage import get_profile_pic, upload_blob, file_in_storage
 import os
 
+# structure api blueprint
+from flask import Blueprint
+
+api = Blueprint('api', __name__)
+
 # @app.route('/')
 # @app.route('/index')
 # def home():
@@ -20,8 +26,9 @@ import os
 #         return redirect(url_for('login'))
 
 
-@app.route('/tasks', methods=['GET','POST', 'DELETE', 'PUT'])
+@api.route('/tasks', methods=['GET','POST', 'DELETE', 'PUT'])
 # @login_required
+@cross_origin
 def tasks():
     response_object = {'status': 'success'}
     request_object = request.get_json()
@@ -76,7 +83,7 @@ def tasks():
     response_object['tasks'] = tasks_list
     return jsonify(response_object)
 
-@app.route('/register', methods = ['POST'])
+@api.route('/register', methods = ['POST'])
 def register():
     if request.method == 'POST':
         response_object = {'status': 200}
@@ -118,7 +125,7 @@ def register():
             response_object['message'] = 'There was an error creating user ' + username + "."
             return jsonify(response_object)
 
-@app.route('/login', methods = ['POST'])
+@api.route('/login', methods = ['POST'])
 def login():
     if request.method == 'POST':
         response_object = {'status': 200}
@@ -146,7 +153,7 @@ def login():
             response_object['message'] = 'Username and/or Password incorrect.'
             return jsonify(response_object)
 
-@app.route('/logout')
+@api.route('/logout')
 def logout():
     response_object = {'status': 200}
     session.clear()
