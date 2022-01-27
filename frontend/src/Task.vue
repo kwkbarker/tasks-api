@@ -94,9 +94,10 @@ export default {
       .then(response => {
         console.log(response)
         if (response.status == 200) {
-          this.message.value = response.message
+          this.message.value = response.data.message
           this.message.color = 'success'
-          this.$router.push('/tasks')
+          // this.$router.push('/tasks')
+          this.$emit('refreshTasks')
         }
       })
       .catch(err => {
@@ -118,8 +119,8 @@ export default {
       .then(response => {
         console.log(response)
         if (response.status == 200) {
-          this.message.value = response.message
-          this.message.color = 'success'
+          // this.message.value = response.message
+          // this.message.color = 'success'
           this.$router.push('/tasks')
         }
       })

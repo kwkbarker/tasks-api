@@ -1,37 +1,31 @@
 from flask.globals import request
-from flask_cors import cross_origin
-from flask_login.utils import logout_user
-from sympy import re
+from api.todolist.helpers import token_required
 from todolist import app, db
-from flask import jsonify, render_template, redirect, url_for, session, flash, request
+from flask import jsonify, request
 from todolist.models import Task, User
-from todolist.forms import LoginForm, RegisterForm, TaskForm
-from todolist.helpers import login_required, validate_email_address, validate_username
-from flask_login import login_user, current_user
-import psycopg2
-from todolist.storage import get_profile_pic, upload_blob, file_in_storage
-import os
+from todolist.helpers import token_required, validate_email_address, validate_username
+# import psycopg2
+# from todolist.storage import get_profile_pic, upload_blob, file_in_storage
+# import os
+import jwt
+from datetime import datetime, timedelta
 
 # structure api blueprint
 from flask import Blueprint
 
 api = Blueprint('api', __name__)
 
-# @app.route('/')
-# @app.route('/index')
-# def home():
-#     if current_user.is_authenticated:
-#         return redirect(url_for('tasks'))
-#     else:
-#         return redirect(url_for('login'))
-
 
 @api.route('/tasks', methods=['GET','POST', 'DELETE', 'PUT'])
-# @login_required
-@cross_origin
+@token_required
 def tasks():
-    response_object = {'status': 'success'}
+    response_object = {'status': 200}
     request_object = request.get_json()
+
+    # if not request_object.get('user'):
+    #     response_object['message'] = 'Please login.'
+    #     return jsonify(response_object)
+
     if request.method == "DELETE":
 
         # if 'done' button pressed, delete task from db
@@ -47,13 +41,11 @@ def tasks():
 
     elif request.method == "POST":
         # ensure at least title entered
-        if request_object.get('title') != '':
-            # add task to db
-            task = Task(title=request_object.get('title'),
-                        description=request_object.get('description'),
-                        importance=request_object.get('importance'),
-                        user=session['user_id'])
+        data = request.get_json()
         
+        if data.get('title') != '':
+            # add task to db
+            task = Task(**data)
             db.session.add(task)
             db.session.commit()
 
@@ -77,7 +69,8 @@ def tasks():
         return jsonify(response_object)
 
     # retrieve tasks from db
-    tasks_object = Task.query.filter_by(user=User.query.filter_by(id=session['user_id']).first().id).all()
+    # tasks_object = Task.query.filter_by(user=User.query.filter_by(id=session['user_id']).first().id).all()
+    tasks_object = Task.query.all()
     tasks_list = [t.serialize for t in tasks_object]
     print(tasks_list)
     response_object['tasks'] = tasks_list
@@ -128,37 +121,50 @@ def register():
 @api.route('/login', methods = ['POST'])
 def login():
     if request.method == 'POST':
-        response_object = {'status': 200}
         post_data = request.get_json()
 
-        username = post_data["username"]
-        password = post_data["password"]
+        user = User.authenticate(**post_data)
 
-        user_id = User.query.filter_by(username=username).first()
-        print(user_id)
-        if not user_id:
-            response_object['status'] = 400
-            response_object['message'] = 'Username not found.'
-            return jsonify(response_object) 
+        if not user:
+            return jsonify({'message': 'Invalid credentials.', 'authenticated': False}), 401
 
-        if user_id and user_id.check_password(pass_to_check=password):
-            session['user_id'] = user_id.id
-            login_user(user_id)
-            response_object['message'] = "Logged in as " + username + "."
-            return jsonify(response_object)
+        token = jwt.encode({
+            'sub': user.username,
+            'iat': datetime.utcnow(),
+            'exp': datetime.utcnow() + timedelta(minutes=30)
+        }, app.config['SECRET_KEY'])
+
+        return jsonify({'token': token.decode('UTF-8')})
+
+        # username = post_data["username"]
+        # password = post_data["password"]
+
         
-        # error handling
-        else:
-            response_object['status'] = 400
-            response_object['message'] = 'Username and/or Password incorrect.'
-            return jsonify(response_object)
+        # user_obj = User.query.filter_by(username=username).first()
+        # if not user_obj:
+        #     response_object['status'] = 400
+        #     response_object['message'] = 'Username not found.'
+        #     return jsonify(response_object) 
 
-@api.route('/logout')
-def logout():
-    response_object = {'status': 200}
-    session.clear()
-    logout_user()
-    return jsonify(response_object)
+        # if user_obj and user_obj.check_password(pass_to_check=password):
+        #     session['user_id'] = user_obj.id
+        #     login_user(user_obj)
+        #     print(session)
+        #     response_object['message'] = "Logged in as " + username + "."
+        #     return jsonify(response_object)
+        
+        # # error handling
+        # else:
+        #     response_object['status'] = 400
+        #     response_object['message'] = 'Username and/or Password incorrect.'
+        #     return jsonify(response_object)
+
+# @api.route('/logout')
+# def logout():
+#     response_object = {'status': 200}
+#     session.clear()
+#     logout_user()
+#     return jsonify(response_object)
 
 
 # @app.route('/upload', methods = ['POST'])

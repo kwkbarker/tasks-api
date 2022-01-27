@@ -45,6 +45,7 @@ import Task from './Task.vue'
 import TaskInput from './TaskInput.vue'
 import axios from 'axios'
 
+
 export default {
   components: {
     Task,
@@ -79,11 +80,12 @@ export default {
         importance: this.importance
       }
 
-      const path = 'http://127.0.0.1:5000/tasks'
+      const path = '/api/tasks'
       axios({
         method: 'post',
         url: path, 
-        data: newTask
+        data: newTask,
+        baseURL: 'http://127.0.0.1'
       })
       .then(response => {
         console.log(response)
@@ -106,19 +108,22 @@ export default {
     },
 
     async refreshTasks() {
-      const path = 'http://127.0.0.1:5000/tasks'
-      axios({
-        url: path
+      const path = '/api/tasks'
+      await axios({
+        method: 'get',
+        url: path,
+        baseURL: 'http://127.0.0.1:5000',
       })
       .then((response) => {
-        const data = response.data
-        console.log(data)
+        console.log(response)
+        this.tasks = response.data.tasks
+
       })
       .catch(err => {
         console.log(err)
       })
       // this.$store.dispatch('tasks/fetch')
-      this.tasks = data.tasks
+      // this.tasks = data.tasks
       this.title = null
       this.description = null
       this.importance = null

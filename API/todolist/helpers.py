@@ -1,17 +1,44 @@
 from functools import wraps
-from pickle import FALSE
-from flask import session, request, redirect, url_for
-from flask_login import current_user
+# from pickle import FALSE
+from flask import jsonify, request
+# from flask_login import current_user
 from todolist.models import User
+import jwt
+from todolist import app
 
-# login required decorator for task view
-def login_required(f):
+# token required decorator for task view
+## help from https://stackabuse.com/single-page-apps-with-vue-js-and-flask-jwt-authentication/
+def token_required(f):
     @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated:
-            return redirect(url_for('login', next=request.url))
-        return f(*args, **kwargs)
-    return decorated_function
+    def _verify(*args, **kwargs):
+        auth_headers = request.headers.get('Authorization', '').split()
+
+        invalid_msg = {
+            'message': 'Invalid token, authentication required.',
+            'Authenticated': False
+        }
+        expired_msg = {
+            'message': 'Expired token. Reauthentication required.',
+            'Authenticated': False
+        }
+
+        if len(auth_headers) != 2:
+            return jsonify(invalid_msg), 401
+
+        try:
+            token = auth_headers[1]
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            user = User.query.filter_by(username=data['sub']).first()
+            if not user:
+                raise RuntimeError('User not found.')
+            return f(user, *args, **kwargs)
+        except jwt.ExpiredSignatureError:
+            return jsonify(expired_msg), 401
+        except (jwt.InvalidTokenError, Exception) as e:
+            print(e)
+            return jsonify(invalid_msg), 401
+
+    return _verify
 
 def validate_username(username_to_check):
         user = User.query.filter_by(username=username_to_check).first()

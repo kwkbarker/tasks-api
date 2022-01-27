@@ -32,8 +32,7 @@ db.create_all()
 
 
 # enable CORS
-cors = CORS(app)
-#, resources={r'/*': {'origins': '*'}}, CORS_SUPPORTS_CREDENTIALS=True
+cors = CORS(app, resources=r'/api/*', send_wildcard=True, origins="*")
 app.config['CORS_HEADERS'] = 'Content-Type'
 logging.getLogger('flask_cors').level = logging.DEBUG
 
