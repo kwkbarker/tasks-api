@@ -1,5 +1,5 @@
 from flask.globals import request
-from api.todolist.helpers import token_required
+from todolist.helpers import token_required
 from todolist import app, db
 from flask import jsonify, request
 from todolist.models import Task, User
