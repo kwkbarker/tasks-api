@@ -12,7 +12,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 #     return User.query.get(int(user_id))
     
 class User(db.Model, UserMixin):
-    __tablename__ = 'users'
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(length=30), nullable=False, unique=True)
     email = db.Column(db.String(length=50), nullable=False, unique=True)
@@ -29,14 +29,17 @@ class User(db.Model, UserMixin):
 
     @classmethod
     def authenticate(cls, **kwargs):
+        print('kwargs: ' + str(kwargs))
         username = kwargs.get('username')
         password = kwargs.get('password')
+        print(username['value'])
+        print(password['value'])
 
         if not username or not password:
             return None
 
-        user = cls.query.filter_by(username=username).first()
-        if not user or not check_password_hash(user.password, password):
+        user = cls.query.filter_by(username=username['value']).first()
+        if not user or not check_password_hash(user.password, password['value']):
             return None
         
         return user
@@ -57,7 +60,6 @@ class User(db.Model, UserMixin):
 
 
 class Task(db.Model):
-    __tablename__ = 'tasks'
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(length=128), nullable=False)

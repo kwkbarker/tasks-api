@@ -72,6 +72,10 @@ const tasks = {
             }
         },
 
+        getUserId(state) {
+
+        }
+
         // title(state, id) {
         //     return state.all[id-1].title
         // },

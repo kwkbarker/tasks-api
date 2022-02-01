@@ -77,15 +77,29 @@ export default {
       console.log("login")
       // POST REQUEST - request.username, request.password
       // flask endpoint -> axios/ajax
-      const path = 'http://127.0.0.1:5000/api/login'
-      axios.post(path, {
+      const path = 'http://127.0.0.1:5000/api/login'      
+            
+      const config = {
         username: this.username,
         password: this.password
+      }
+
+      axios.interceptors.request.use(function (config) {
+        console.log(config)
+        return config
+      }, function (error) {
+        // Do something with request error
+        return Promise.reject(error)
       })
+
+
+
+      axios.post(path, config)
       .then(response => {
         console.log(response)
         const data = response.data
-        if (data.status == 200) {
+        if (response.status == 200) {
+          console.log(data.userid)
           this.message.value = data.message
           this.message.color = 'success'
           this.$store.commit('tasks/setUser', this.username)

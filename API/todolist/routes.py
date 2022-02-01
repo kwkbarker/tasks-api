@@ -87,8 +87,8 @@ def register():
         email = post_data.get('email')
         confirm = post_data.get('confirm')
 
-        print(username)
-        print(validate_username(username))
+        print(username.value)
+        print(validate_username(username.value))
 
         if not validate_username(username):
             response_object['status'] = 400
@@ -123,7 +123,7 @@ def login():
     if request.method == 'POST':
         post_data = request.get_json()
 
-        user = User.authenticate(**post_data)
+        user = User.authenticate(username=post_data['username'], password=post_data['password'])
 
         if not user:
             return jsonify({'message': 'Invalid credentials.', 'authenticated': False}), 401
@@ -134,7 +134,9 @@ def login():
             'exp': datetime.utcnow() + timedelta(minutes=30)
         }, app.config['SECRET_KEY'])
 
-        return jsonify({'token': token.decode('UTF-8')})
+        print(token)
+
+        return jsonify({'token': token, 'userid': user.id, 'message': 'Logged in as ' + user.username + '.'})
 
         # username = post_data["username"]
         # password = post_data["password"]
