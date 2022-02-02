@@ -106,7 +106,7 @@ export default {
           this.$store.commit('tasks/setToken', data.token)
           this.$store.commit('tasks/setUser', data.userid)
           this.$store.dispatch('tasks/save')
-          console.log('user: ' + this.$store.tasks.state.username)
+          console.log('token: ' + this.$store.state.tasks.token)
           this.$router.push('/tasks')
         }
       })

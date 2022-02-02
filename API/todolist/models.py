@@ -29,7 +29,6 @@ class User(db.Model, UserMixin):
 
     @classmethod
     def authenticate(cls, **kwargs):
-        print('kwargs: ' + str(kwargs))
         username = kwargs.get('username')
         password = kwargs.get('password')
 
@@ -64,6 +63,7 @@ class Task(db.Model):
     description = db.Column(db.String(length=1024), nullable=False)
     importance = db.Column(db.String(length=12), nullable=True)
     user = db.Column(db.Integer, db.ForeignKey('user.id'))
+    done = db.Column(db.Boolean, default=False, nullable=False) 
 
     def __repr__(self):
         return self.title

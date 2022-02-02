@@ -1,5 +1,11 @@
 <template>
   <div class="wrapper">
+    <div 
+      class="alert" 
+      :class='alertColor' 
+      role="alert"
+    >{{message.value}}</div>
+
     <div class="tasks-list">
       <h2 class="grey">Tasks</h2>
       <div
@@ -11,6 +17,7 @@
           >
             <task :task="task"
             @refreshTasks='refreshTasks'
+            @showMessage='showMessage'
             />
           </div>
       </div>
@@ -57,7 +64,11 @@ export default {
       title: null,
       description: null,
       importance: null,
-      tasks: []
+      tasks: [],
+      message: {
+        value: '',
+        color: ''
+      }
     }
   },
 
@@ -65,6 +76,10 @@ export default {
   // or initialize empty storage
   mounted() {
     this.refreshTasks()
+  },
+
+  watch: {
+    '$route': 'refreshTasks'
   },
 
   methods: {
@@ -85,12 +100,15 @@ export default {
         method: 'post',
         url: path, 
         data: newTask,
-        baseURL: 'http://127.0.0.1'
+        baseURL: 'http://127.0.0.1:5000',
+        headers: {
+          'Authorization': `Bearer: ${this.$store.state.tasks.token}`
+        }
       })
       .then(response => {
         console.log(response)
         if (response.status == 200) {
-          this.message.value = response.message
+          this.message.value = response.data.message
           this.message.color = 'success'
           this.$router.push('/tasks')
         }
@@ -113,6 +131,9 @@ export default {
         method: 'get',
         url: path,
         baseURL: 'http://127.0.0.1:5000',
+        headers: {
+          'Authorization': `Bearer: ${this.$store.state.tasks.token}`
+        }
       })
       .then((response) => {
         console.log(response)
@@ -129,7 +150,18 @@ export default {
       this.importance = null
     },
 
+    showMessage(newMessage) {
+      this.message.value = newMessage.value
+      this.message.color = newMessage.color
+    }
+
   },
+
+  computed: {
+    alertColor() {
+      return "alert-" + this.message.color
+    }
+  }
 
 }
 </script>

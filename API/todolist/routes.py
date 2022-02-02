@@ -1,4 +1,5 @@
 from flask.globals import request
+from importlib_metadata import re
 from todolist.helpers import token_required
 from todolist import app, db
 from flask import jsonify, request
@@ -22,16 +23,12 @@ def tasks():
     response_object = {'status': 200}
     request_object = request.get_json()
 
-    # if not request_object.get('user'):
-    #     response_object['message'] = 'Please login.'
-    #     return jsonify(response_object)
-
     if request.method == "DELETE":
-
         # if 'done' button pressed, delete task from db
         
         done_task = Task.query.filter_by(id=request_object.get('id')).first()
-        db.session.delete(done_task)
+        done_task.done = True
+
         db.session.commit()
 
         response_object['message'] = 'Task finished!'
@@ -71,7 +68,7 @@ def tasks():
     # retrieve tasks from db
     # tasks_object = Task.query.filter_by(user=User.query.filter_by(id=session['user_id']).first().id).all()
     tasks_object = Task.query.all()
-    tasks_list = [t.serialize for t in tasks_object]
+    tasks_list = [t.serialize for t in tasks_object if not t.done]
     print(tasks_list)
     response_object['tasks'] = tasks_list
     return jsonify(response_object)
@@ -129,8 +126,6 @@ def login():
             'iat': datetime.utcnow(),
             'exp': datetime.utcnow() + timedelta(minutes=30)
         }, app.config['SECRET_KEY'])
-
-        print(token)
 
         return jsonify({'token': token, 'userid': user.id, 'message': 'Logged in as ' + user.username + '.'})
 

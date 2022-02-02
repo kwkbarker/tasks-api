@@ -12,6 +12,7 @@ def token_required(f):
     @wraps(f)
     def _verify(*args, **kwargs):
         auth_headers = request.headers.get('Authorization', '').split()
+        print(auth_headers)
 
         invalid_msg = {
             'message': 'Invalid token, authentication required.',
@@ -27,11 +28,11 @@ def token_required(f):
 
         try:
             token = auth_headers[1]
-            data = jwt.decode(token, app.config['SECRET_KEY'])
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
             user = User.query.filter_by(username=data['sub']).first()
             if not user:
                 raise RuntimeError('User not found.')
-            return f(user, *args, **kwargs)
+            return f(*args, **kwargs)
         except jwt.ExpiredSignatureError:
             return jsonify(expired_msg), 401
         except (jwt.InvalidTokenError, Exception) as e:
@@ -42,7 +43,6 @@ def token_required(f):
 
 def validate_username(username_to_check):
         user = User.query.filter_by(username=username_to_check).first()
-        print(user)
         if user:
             return False
         else:

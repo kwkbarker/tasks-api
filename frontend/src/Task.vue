@@ -75,6 +75,15 @@ export default {
     editDesc: String
   },
 
+  data() {
+    return {
+      newMessage: {
+         value: '',
+         color: ''
+      }
+    }
+  },
+
   methods: {
     editTask(newTask) {
       // Called on emit from EditInput
@@ -89,13 +98,17 @@ export default {
       axios({
         method: 'put',
         url: path, 
-        data: editedTask
+        data: editedTask,
+        headers: {
+          'Authorization': `Bearer: ${this.$store.state.tasks.token}`
+        }
       })
       .then(response => {
         console.log(response)
         if (response.status == 200) {
-          this.message.value = response.data.message
-          this.message.color = 'success'
+          this.newMessage.value = response.data.message
+          this.newMessage.color = 'success'
+          this.$emit('showMessage', this.newMessage)
           // this.$router.push('/tasks')
           this.$emit('refreshTasks')
         }
@@ -112,9 +125,15 @@ export default {
     deleteClick() {
 
       const path = 'http://127.0.0.1:5000/api/tasks'
-      axios.post(path, {
-        username: this.username,
-        password: this.password
+      axios({
+        url: path,
+        method: 'DELETE',
+        data: {
+          'id' :this.task.id,
+        },
+        headers: {
+          'Authorization': `Bearer: ${this.$store.state.tasks.token}`
+        }
       })
       .then(response => {
         console.log(response)

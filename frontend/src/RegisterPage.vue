@@ -48,7 +48,7 @@
       </div>
 
       <div class="">
-        <button class="btn btn-primary" type="submit">Login</button>
+        <button class="btn btn-primary" type="submit">Register</button>
       </div>
 
       <div class="row row-content justify-content-end col-sm-10 mt-4">
