@@ -68,7 +68,8 @@ export default {
       message: {
         value: '',
         color: ''
-      }
+      },
+      token: null,
     }
   },
 
@@ -102,7 +103,8 @@ export default {
           console.log(data.userid)
           this.message.value = data.message
           this.message.color = 'success'
-          this.$store.commit('tasks/setUser', this.username)
+          this.$store.commit('tasks/setToken', data.token)
+          this.$store.commit('tasks/setUser', data.userid)
           this.$store.dispatch('tasks/save')
           console.log('user: ' + this.$store.tasks.state.username)
           this.$router.push('/tasks')

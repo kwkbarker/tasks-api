@@ -32,8 +32,6 @@ class User(db.Model, UserMixin):
         print('kwargs: ' + str(kwargs))
         username = kwargs.get('username')
         password = kwargs.get('password')
-        print(username['value'])
-        print(password['value'])
 
         if not username or not password:
             return None

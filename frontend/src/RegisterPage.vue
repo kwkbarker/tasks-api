@@ -1,5 +1,11 @@
 <template>
   <div class="container">
+    <div 
+      class="alert" 
+      :class='alertColor' 
+      role="alert"
+    >{{message.value}}</div>
+
     <form 
       class="form-register"
       @submit.prevent="registerUser"
@@ -96,8 +102,7 @@ export default {
       axios.post(path, {
         username: this.username,
         password: this.password,
-        email: this.email,
-        confirm: this.confirm
+        email: this.email
       })
       .then(response => {
         console.log(response)
@@ -113,6 +118,12 @@ export default {
       }
     }
   },
+
+  computed: {
+    alertColor() {
+      return "alert-" + this.message.color
+    }
+  }
 }
 </script>
 

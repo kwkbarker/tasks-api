@@ -82,25 +82,21 @@ def register():
         response_object = {'status': 200}
         post_data = request.get_json()
 
-        username = post_data.get('username')
-        password = post_data.get('password')
-        email = post_data.get('email')
-        confirm = post_data.get('confirm')
+        if post_data:
+            username = post_data.get('username')
+            password = post_data.get('password')
+            email = post_data.get('email')
 
-        print(username.value)
-        print(validate_username(username.value))
+            if not validate_username(username):
+                response_object['status'] = 400
+                response_object['message'] = "Username already exists."
+                return jsonify(response_object)
+            
+            if not validate_email_address(email):
+                response_object['status'] = 400
+                response_object['message'] = "Email already registered. Please login."
+                return jsonify(response_object)
 
-        if not validate_username(username):
-            response_object['status'] = 400
-            response_object['message'] = "Username already exists."
-            return jsonify(response_object)
-        
-        if not validate_email_address(email):
-            response_object['status'] = 400
-            response_object['message'] = "Email already registered. Please login."
-            return jsonify(response_object)
-
-        if password == confirm:
             user = User(username=username,
             email=email,
             password=password)

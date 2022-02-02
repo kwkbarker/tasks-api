@@ -7,7 +7,8 @@ const tasks = {
     state() {
         return {
             all: [],
-            user: null
+            user: null,
+            token: null
         }
     },
 
@@ -40,6 +41,10 @@ const tasks = {
 
         setUser(state, username) {
             state.user = username
+        },
+
+        setToken(state, token) {
+            state.token = token
         }
 
     },
@@ -73,7 +78,11 @@ const tasks = {
         },
 
         getUserId(state) {
+            return state.user
+        },
 
+        getCurrentToken(state) {
+            return state.token
         }
 
         // title(state, id) {
