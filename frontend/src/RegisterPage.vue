@@ -100,8 +100,8 @@ export default {
 
       const path = 'http://127.0.0.1:5000/api/register'
       axios.post(path, {
-        username: this.username,
-        password: this.password,
+        username: this.username.value,
+        password: this.password.value,
         email: this.email
       })
       .then(response => {
@@ -110,6 +110,8 @@ export default {
       .catch(err => {
         console.log(err)
       })
+
+      this.$router.push('/login')
     },
 
     update(payload) {

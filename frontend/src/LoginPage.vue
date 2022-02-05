@@ -81,8 +81,8 @@ export default {
       const path = 'http://127.0.0.1:5000/api/login'      
             
       const config = {
-        username: this.username,
-        password: this.password
+        username: this.username.value,
+        password: this.password.value
       }
 
       axios.interceptors.request.use(function (config) {
@@ -105,7 +105,7 @@ export default {
           this.message.color = 'success'
           this.$store.commit('tasks/setToken', data.token)
           this.$store.commit('tasks/setUser', data.userid)
-          this.$store.dispatch('tasks/save')
+          this.$store.commit('tasks/setUsername', this.username.value)
           console.log('token: ' + this.$store.state.tasks.token)
           this.$router.push('/tasks')
         }

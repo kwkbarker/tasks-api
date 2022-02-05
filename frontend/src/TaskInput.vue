@@ -38,7 +38,6 @@
           class='btn-check'
           name='importance'
           value='danger'
-          checked='true'
           :id='dangBtnId'
           @input="$emit('update:importance', 'danger')"
         />

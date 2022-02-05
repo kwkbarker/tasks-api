@@ -31,12 +31,14 @@ class User(db.Model, UserMixin):
     def authenticate(cls, **kwargs):
         username = kwargs.get('username')
         password = kwargs.get('password')
+        print(username)
+        print(password)
 
         if not username or not password:
             return None
 
-        user = cls.query.filter_by(username=username['value']).first()
-        if not user or not check_password_hash(user.password, password['value']):
+        user = cls.query.filter_by(username=username).first()
+        if not user or not check_password_hash(user.password, password):
             return None
         
         return user

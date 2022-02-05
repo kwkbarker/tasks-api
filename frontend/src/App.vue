@@ -15,13 +15,13 @@
         </ul>
 
         
-      <div v-if="current_user.is_authenticated">
+      <div v-if="authenticated">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <div class="nav-link">Welcome, <router-link>{{ current_user.username }}</router-link></div>
+                <div class="nav-link">Welcome, {{ username }}</div>
             </li>
             <li class="nav-item">
-                <button class="nav-link" @click="logout">Logout</button>
+                <div class="nav-link" @click="logout">Logout</div>
             </li>
         </ul>
       </div>
@@ -49,13 +49,29 @@
 export default {
   data() {
     return {
-      current_user: Object,
+
     }
   },
 
   methods: {
     logout() {
-      axios.get('http://127.0.0.1:5000/api/logout')
+      console.log('logout')
+      this.$store.commit('tasks/logoutUser')
+      this.$router.push('/login')
+    }
+  },
+
+  computed: {
+    authenticated() {
+      if (this.username) {
+        return true
+      } else {
+        return false
+      }
+    },
+
+    username() {
+      return this.$store.state.tasks.username
     }
   }
 }

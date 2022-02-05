@@ -83,20 +83,20 @@ export default {
   },
 
   methods: {
-    addTask() {
+    async addTask() {
       if (!this.title) {
         return
       }
 
       const newTask = {
-        id: this.$store.getters['tasks/nextId'],
         title: this.title,
         description: this.description,
-        importance: this.importance
+        importance: this.importance,
+        user: this.$store.state.tasks.user
       }
 
       const path = '/api/tasks'
-      axios({
+      await axios({
         method: 'post',
         url: path, 
         data: newTask,
@@ -110,19 +110,17 @@ export default {
         if (response.status == 200) {
           this.message.value = response.data.message
           this.message.color = 'success'
-          this.$router.push('/tasks')
+          this.title = null
+          this.description = null
+          this.importance = null
+          console.log('added')
+          this.refreshTasks()
         }
       })
       .catch(err => {
         console.log(err)
       })
-      // this.$store.commit('tasks/addTask', newTask)
-      // this.$store.dispatch('tasks/save')
-      this.title = null
-      this.description = null
-      this.importance = null
 
-      this.$emit('refreshTasks')
     },
 
     async refreshTasks() {
@@ -143,8 +141,7 @@ export default {
       .catch(err => {
         console.log(err)
       })
-      // this.$store.dispatch('tasks/fetch')
-      // this.tasks = data.tasks
+
       this.title = null
       this.description = null
       this.importance = null

@@ -42,11 +42,12 @@ def token_required(f):
     return _verify
 
 def validate_username(username_to_check):
-        user = User.query.filter_by(username=username_to_check).first()
-        if user:
-            return False
-        else:
-            return True
+    print(username_to_check)
+    user = User.query.filter_by(username=username_to_check).first()
+    if user:
+        return False
+    else:
+        return True
 
 def validate_email_address(email_address_to_check):
     email = User.query.filter_by(email=email_address_to_check).first()

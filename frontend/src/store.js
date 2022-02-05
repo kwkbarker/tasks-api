@@ -6,76 +6,39 @@ const tasks = {
 
     state() {
         return {
-            all: [],
             user: null,
+            username: null,
             token: null
         }
     },
 
     mutations: {
-        setTasks(state, tasks) {
-            if (tasks) {
-                state.all = tasks
-            } else {
-                state.all = []
-            }
+
+        setUser(state, id) {
+            state.user = id
         },
 
-        addTask(state, task) {
-            state.all.push(task)
-        },
-
-        editTask(state, newTask) {
-            state.all[newTask.id] = newTask
-        },
-
-        deleteTask(state, taskId) {
-            state.all.splice([taskId], 1)
-        },
-
-        fixIds(state) {
-            for (var i = 0; i < state.all.length; i++){
-                state.all[i].id = i
-            }
-        },
-
-        setUser(state, username) {
-            state.user = username
+        setUsername(state, username) {
+            state.username = username
         },
 
         setToken(state, token) {
             state.token = token
+        },
+
+        logoutUser(state) {
+            state.user = null
+            state.token = null
+            state.username = null
         }
 
     },
 
     actions: {
 
-        // fetch
-        fetch(ctx) {
-            var str_data =  localStorage.getItem('tasks')
-            var arr = JSON.parse(str_data)
-            ctx.commit('setTasks', arr)
-        },
-
-        save(ctx) {
-            const parsed = JSON.stringify(ctx.state.all)
-            localStorage.setItem('tasks', parsed)
-        }
     },
 
     getters: {
-        count(state) {
-            return state.all.length
-        },
-
-        nextId(state) {
-            if (state.all.length > 0) {
-                return state.all.length
-            } else {
-                return 0
-            }
-        },
 
         getUserId(state) {
             return state.user
@@ -83,19 +46,12 @@ const tasks = {
 
         getCurrentToken(state) {
             return state.token
+        },
+
+        getUsername(state) {
+            return state.username
         }
 
-        // title(state, id) {
-        //     return state.all[id-1].title
-        // },
-
-        // description(state, id) {
-        //     return state.all[id-1].description
-        // },
-
-        // importance(state, id) {
-        //     return state.all[id-1].importance
-        // },
     }
 }
 

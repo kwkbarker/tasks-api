@@ -80,9 +80,9 @@ def register():
         post_data = request.get_json()
 
         if post_data:
-            username = post_data.get('username')
-            password = post_data.get('password')
-            email = post_data.get('email')
+            username = post_data['username']
+            password = post_data['password']
+            email = post_data['email']
 
             if not validate_username(username):
                 response_object['status'] = 400
@@ -108,7 +108,7 @@ def register():
         # error handling
         else:
             response_object['status'] = 400
-            response_object['message'] = 'There was an error creating user ' + username + "."
+            response_object['message'] = 'There was an error creating user.'
             return jsonify(response_object)
 
 @api.route('/login', methods = ['POST'])
@@ -119,7 +119,7 @@ def login():
         user = User.authenticate(username=post_data['username'], password=post_data['password'])
 
         if not user:
-            return jsonify({'message': 'Invalid credentials.', 'authenticated': False}), 401
+            return jsonify({'message': 'Invalid credentials.', 'authenticated': False, 'status': 401})
 
         token = jwt.encode({
             'sub': user.username,
@@ -128,36 +128,6 @@ def login():
         }, app.config['SECRET_KEY'])
 
         return jsonify({'token': token, 'userid': user.id, 'message': 'Logged in as ' + user.username + '.'})
-
-        # username = post_data["username"]
-        # password = post_data["password"]
-
-        
-        # user_obj = User.query.filter_by(username=username).first()
-        # if not user_obj:
-        #     response_object['status'] = 400
-        #     response_object['message'] = 'Username not found.'
-        #     return jsonify(response_object) 
-
-        # if user_obj and user_obj.check_password(pass_to_check=password):
-        #     session['user_id'] = user_obj.id
-        #     login_user(user_obj)
-        #     print(session)
-        #     response_object['message'] = "Logged in as " + username + "."
-        #     return jsonify(response_object)
-        
-        # # error handling
-        # else:
-        #     response_object['status'] = 400
-        #     response_object['message'] = 'Username and/or Password incorrect.'
-        #     return jsonify(response_object)
-
-# @api.route('/logout')
-# def logout():
-#     response_object = {'status': 200}
-#     session.clear()
-#     logout_user()
-#     return jsonify(response_object)
 
 
 # @app.route('/upload', methods = ['POST'])
