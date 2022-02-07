@@ -102,7 +102,7 @@ export default {
       axios.post(path, {
         username: this.username.value,
         password: this.password.value,
-        email: this.email
+        email: this.email.value
       })
       .then(response => {
         console.log(response)

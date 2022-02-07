@@ -124,13 +124,18 @@ export default {
     },
 
     async refreshTasks() {
+
+      if (!this.$store.state.tasks.user) {
+        this.$router.push('/login')
+      }
       const path = '/api/tasks'
       await axios({
         method: 'get',
         url: path,
         baseURL: 'http://127.0.0.1:5000',
         headers: {
-          'Authorization': `Bearer: ${this.$store.state.tasks.token}`
+          'Authorization': `Bearer: ${this.$store.state.tasks.token}`,
+          'User': `${this.$store.state.tasks.user}`
         }
       })
       .then((response) => {

@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import  createPersistedState from 'vuex-persistedstate'
 
 // module: tasks
 const tasks = {
@@ -58,5 +59,6 @@ const tasks = {
 export const store = createStore({
     modules: {
         tasks
-    }
+    },
+    plugins: [createPersistedState()]
 })

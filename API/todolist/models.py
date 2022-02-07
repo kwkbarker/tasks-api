@@ -31,8 +31,6 @@ class User(db.Model, UserMixin):
     def authenticate(cls, **kwargs):
         username = kwargs.get('username')
         password = kwargs.get('password')
-        print(username)
-        print(password)
 
         if not username or not password:
             return None
