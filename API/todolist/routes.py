@@ -20,12 +20,10 @@ api = Blueprint('api', __name__)
 @api.route('/tasks', methods=['GET','POST', 'DELETE', 'PUT'])
 @token_required
 def tasks():
-    print('tasks')
     response_object = {'status': 200}
     request_object = request.get_json()
 
-    user_id_list = request.headers.get('User', '').split()
-    user_id = user_id_list[0]
+    print(request.method)
 
     if request.method == "DELETE":
         # if 'done' button pressed, delete task from db
@@ -60,7 +58,9 @@ def tasks():
 
             
     elif request.method == "PUT":
+        print('put request')
         task = Task.query.filter_by(id=request_object.get("id")).first()
+        print(task)
         task.title = request_object.get('title')
         task.description = request_object.get('description')
         task.importance = request_object.get('importance')
@@ -69,13 +69,16 @@ def tasks():
         response_object['message'] = 'Task saved.'
         return jsonify(response_object)
 
-    # retrieve tasks from db
-    # tasks_object = Task.query.filter_by(user=User.query.filter_by(id=session['user_id']).first().id).all()
-    tasks_object = Task.query.filter(user=user_id)
-    tasks_list = [t.serialize for t in tasks_object if not t.done]
-    print(tasks_list)
-    response_object['tasks'] = tasks_list
-    return jsonify(response_object)
+    elif request.method == "GET":
+        user_id_list = request.headers.get('User', '').split()
+        user_id = user_id_list[0]
+        # retrieve tasks from db
+        # tasks_object = Task.query.filter_by(user=User.query.filter_by(id=session['user_id']).first().id).all()
+        tasks_object = Task.query.filter_by(user=user_id)
+        tasks_list = [t.serialize for t in tasks_object if not t.done]
+        print(tasks_list)
+        response_object['tasks'] = tasks_list
+        return jsonify(response_object)
 
 @api.route('/register', methods = ['POST'])
 def register():
@@ -119,6 +122,8 @@ def register():
 def login():
     if request.method == 'POST':
         post_data = request.get_json()
+
+        print(post_data)
 
         user = User.authenticate(username=post_data['username'], password=post_data['password'])
 

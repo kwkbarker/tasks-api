@@ -51,6 +51,7 @@
 import Task from './Task.vue'
 import TaskInput from './TaskInput.vue'
 import axios from 'axios'
+import { checkJwt } from './utils'
 
 
 export default {
@@ -113,7 +114,6 @@ export default {
           this.title = null
           this.description = null
           this.importance = null
-          console.log('added')
           this.refreshTasks()
         }
       })
@@ -128,6 +128,19 @@ export default {
       if (!this.$store.state.tasks.user) {
         this.$router.push('/login')
       }
+
+      const config = {
+        username: this.$store.state.tasks.username,
+        password: this.$store.state.tasks.password
+      }
+
+      // refresh expired jwt
+      if (!checkJwt(this.$store.state.tasks.token)) {
+        this.refreshToken()
+      } else {
+        console.log('valid: ' + this.$store.state.tasks.token)
+      }
+
       const path = '/api/tasks'
       await axios({
         method: 'get',
@@ -140,7 +153,9 @@ export default {
       })
       .then((response) => {
         console.log(response)
-        this.tasks = response.data.tasks
+        if (response.data.tasks) {
+          this.tasks = response.data.tasks
+        }
 
       })
       .catch(err => {
@@ -155,7 +170,36 @@ export default {
     showMessage(newMessage) {
       this.message.value = newMessage.value
       this.message.color = newMessage.color
-    }
+    },
+
+    async refreshToken() {
+      console.log('new jwt')
+      const path = 'http://127.0.0.1:5000/api/login'
+      const config = {
+        username: this.$store.state.tasks.username,
+        password: this.$store.state.tasks.password
+      } 
+      await axios.post(path, config)
+      .then(response => {
+        console.log(response)
+        const data = response.data
+        if (data.userid) {
+          this.$store.commit('tasks/setToken', data.token)
+          this.$store.commit('tasks/setUser', data.userid)
+          this.$store.commit('tasks/setPassword', this.$store.state.tasks.password)
+          this.$store.commit('tasks/setUsername', this.$store.state.tasks.username)
+          console.log('token: ' + this.$store.state.tasks.token)
+          this.$router.push('/tasks', this.message)
+        } else {
+          this.message.value = data.message
+          this.message.color = 'danger'
+        }
+      })
+      .catch(err => {
+        console.log(err)
+        return err
+      })
+    },
 
   },
 

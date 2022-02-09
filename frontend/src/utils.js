@@ -1,20 +1,13 @@
-export function login(path, config) {
-    axios.post(path, config)
-      .then(response => {
-        console.log(response)
-        const data = response.data
-        if (response.status == 200) {
-          console.log(data.userid)
-          this.message.value = data.message
-          this.message.color = 'success'
-          this.$store.commit('tasks/setToken', data.token)
-          this.$store.commit('tasks/setUser', data.userid)
-          this.$store.commit('tasks/setUsername', this.username.value)
-          console.log('token: ' + this.$store.state.tasks.token)
-          this.$router.push('/tasks')
-        }
-      })
-      .catch(err => {
-        console.log(err)
-      })
+
+
+function checkJwt(jwt) {
+  if (!jwt || jwt.split('.').length < 3) {
+    return false
+  }
+  const data = JSON.parse(atob(jwt.split('.')[1]))
+  const exp = new Date(data.exp * 1000)
+  const now = new Date()
+  return now < exp
 }
+
+export { checkJwt }

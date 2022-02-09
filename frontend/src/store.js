@@ -9,6 +9,7 @@ const tasks = {
         return {
             user: null,
             username: null,
+            password: null,
             token: null
         }
     },
@@ -17,6 +18,10 @@ const tasks = {
 
         setUser(state, id) {
             state.user = id
+        },
+
+        setPassword(state, password) {
+            state.password = password
         },
 
         setUsername(state, username) {
@@ -29,6 +34,7 @@ const tasks = {
 
         logoutUser(state) {
             state.user = null
+            state.password = null
             state.token = null
             state.username = null
         }
@@ -43,6 +49,10 @@ const tasks = {
 
         getUserId(state) {
             return state.user
+        },
+
+        getPassword(state){
+            return state.password
         },
 
         getCurrentToken(state) {

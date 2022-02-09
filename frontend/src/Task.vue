@@ -60,6 +60,7 @@
 import TaskInput from './TaskInput.vue'
 import EditInput from './EditInput.vue'
 import axios from 'axios'
+import { checkJwt } from './utils'
 
 export default {
   components: {
@@ -85,7 +86,7 @@ export default {
   },
 
   methods: {
-    editTask(newTask) {
+    async editTask(newTask) {
       // Called on emit from EditInput
       const editedTask = {
         id: this.task.id,
@@ -94,9 +95,17 @@ export default {
         importance: newTask.importance
       }
 
+      // refresh expired jwt
+      if (!checkJwt(this.$store.state.tasks.token)) {
+        this.refreshToken()
+      } else {
+        console.log('valid: ' + this.$store.state.tasks.token)
+      }
+
       const path = 'http://127.0.0.1:5000/api/tasks'
-      axios({
-        method: 'put',
+
+      await axios({
+        method: 'PUT',
         url: path, 
         data: editedTask,
         headers: {
@@ -105,12 +114,17 @@ export default {
       })
       .then(response => {
         console.log(response)
-        if (response.status == 200) {
+        if (response.data.Authenticated) {
           this.newMessage.value = response.data.message
           this.newMessage.color = 'success'
           this.$emit('showMessage', this.newMessage)
           // this.$router.push('/tasks')
           this.$emit('refreshTasks')
+        } else {
+          this.refreshToken()
+          this.newMessage.value = 'There was a problem. Please try again.'
+          this.newMessage.color = 'danger'
+          this.$emit('showMessage', this.newMessage)
         }
       })
       .catch(err => {
@@ -121,11 +135,41 @@ export default {
       // this.$emit('refreshTasks')
     },
 
+    async refreshToken() {
+      // refresh expired jwt
+      const path = 'http://127.0.0.1:5000/api/login'
+      const config = {
+        username: this.$store.state.tasks.username,
+        password: this.$store.state.tasks.password
+      } 
+      await axios.post(path, config)
+      .then(response => {
+        console.log(response)
+        const data = response.data
+        if (data.userid) {
+          console.log(data.userid)
+          this.$store.commit('tasks/setToken', data.token)
+          this.$store.commit('tasks/setUser', data.userid)
+          this.$store.commit('tasks/setPassword', this.$store.state.tasks.password)
+          this.$store.commit('tasks/setUsername', this.$store.state.tasks.username)
+          console.log('token: ' + this.$store.state.tasks.token)
+          this.$router.push('/tasks', this.message)
+        } else {
+          this.message.value = data.message
+          this.message.color = 'danger'
+        }
+      })
+      .catch(err => {
+        console.log(err)
+        return err
+      })
+    },
 
-    deleteClick() {
+
+    async deleteClick() {
 
       const path = 'http://127.0.0.1:5000/api/tasks'
-      axios({
+      await axios({
         url: path,
         method: 'DELETE',
         data: {
@@ -138,19 +182,16 @@ export default {
       .then(response => {
         console.log(response)
         if (response.status == 200) {
-          // this.message.value = response.message
-          // this.message.color = 'success'
+          this.message.value = response.message
+          this.message.color = 'success'
           this.$router.push('/tasks')
         }
       })
       .catch(err => {
         console.log(err)
       })
-      // this.$store.commit('tasks/deleteTask', this.task.id)
-      // this.$store.commit('tasks/fixIds')
-      // this.$store.dispatch('tasks/save')
 
-      // call refreshTasks in parent component (App.vue)
+      // call refreshTasks in parent component (Tasks.vue)
       this.$emit('refreshTasks')
     },
 

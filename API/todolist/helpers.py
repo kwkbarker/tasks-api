@@ -5,6 +5,7 @@ from flask import jsonify, request
 from todolist.models import User
 import jwt
 from todolist import app
+import time
 
 # token required decorator for task view
 ## help from https://stackabuse.com/single-page-apps-with-vue-js-and-flask-jwt-authentication/
@@ -12,7 +13,7 @@ def token_required(f):
     @wraps(f)
     def _verify(*args, **kwargs):
         auth_headers = request.headers.get('Authorization', '').split()
-        print(auth_headers)
+        print('auth headers: ' + str(auth_headers))
 
         invalid_msg = {
             'message': 'Invalid token, authentication required.',
@@ -31,14 +32,16 @@ def token_required(f):
         try:
             token = auth_headers[1]
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            print(data['exp'] > time.time())
             user = User.query.filter_by(username=data['sub']).first()
+            print(user)
             if not user:
                 raise RuntimeError('User not found.')
             return f(*args, **kwargs)
         except jwt.ExpiredSignatureError:
             return jsonify(expired_msg)
         except (jwt.InvalidTokenError, Exception) as e:
-            print(e)
+            print('error - ' + str(e))
             return jsonify(invalid_msg)
 
     return _verify

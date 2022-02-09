@@ -52,8 +52,8 @@
 </template>
 
 <script>
-import axios from 'axios'
 import UsernameInput from './UsernameInput.vue'
+import axios from 'axios'
 
 export default {
   components: { UsernameInput },
@@ -75,7 +75,6 @@ export default {
 
   methods: {
     loginUser() {
-      console.log("login")
       // POST REQUEST - request.username, request.password
       // flask endpoint -> axios/ajax
       const path = 'http://127.0.0.1:5000/api/login'      
@@ -85,35 +84,39 @@ export default {
         password: this.password.value
       }
 
-      axios.interceptors.request.use(function (config) {
-        console.log(config)
-        return config
-      }, function (error) {
-        // Do something with request error
-        return Promise.reject(error)
-      })
-
-
+      // axios.interceptors.request.use(function (config) {
+      //   console.log(config)
+      //   return config
+      // }, function (error) {
+      //   // Do something with request error
+      //   return Promise.reject(error)
+      // })
 
       axios.post(path, config)
       .then(response => {
         console.log(response)
         const data = response.data
-        if (response.status == 200) {
+
+        if (data.Authenticated) {
           console.log(data.userid)
-          this.message.value = data.message
-          this.message.color = 'success'
           this.$store.commit('tasks/setToken', data.token)
           this.$store.commit('tasks/setUser', data.userid)
+          this.$store.commit('tasks/setPassword', this.password.value)
           this.$store.commit('tasks/setUsername', this.username.value)
           console.log('token: ' + this.$store.state.tasks.token)
           this.$router.push('/tasks')
+        } else {
+          this.message.value = data.message
+          this.message.color = 'danger'
         }
+            
       })
       .catch(err => {
         console.log(err)
+        return err
       })
-      
+
+
     },
 
     updateFields(payload) {

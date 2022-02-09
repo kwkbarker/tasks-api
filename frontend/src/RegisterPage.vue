@@ -91,27 +91,26 @@ export default {
 
   methods: {
     registerUser() {
-      console.log("register")
 
-      if (this.password != this.confirm) {
-        this.message = "Passwords must match."
+      if (this.password == this.confirm) {
+        const path = 'http://127.0.0.1:5000/api/register'
+        axios.post(path, {
+          username: this.username.value,
+          password: this.password.value,
+          email: this.email.value
+        })
+        .then(response => {
+          console.log(response)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+
+        this.$router.push('/login')
+      } else {
+        this.message.value = "Passwords must match."
         this.color = 'danger'
       }
-
-      const path = 'http://127.0.0.1:5000/api/register'
-      axios.post(path, {
-        username: this.username.value,
-        password: this.password.value,
-        email: this.email.value
-      })
-      .then(response => {
-        console.log(response)
-      })
-      .catch(err => {
-        console.log(err)
-      })
-
-      this.$router.push('/login')
     },
 
     update(payload) {

@@ -55,7 +55,6 @@ export default {
 
   methods: {
     logout() {
-      console.log('logout')
       this.$store.commit('tasks/logoutUser')
       this.$router.push('/login')
     }
