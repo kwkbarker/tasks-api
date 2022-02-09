@@ -139,6 +139,9 @@ def login():
         return jsonify({'token': token, 'userid': user.id, 'message': 'Logged in as ' + user.username + '.'})
 
 
+### PROFILE PIC CODE FROM FLASK-ONLY VERSION -
+## UNUSED IN API VERSION
+
 # @app.route('/upload', methods = ['POST'])
 # @login_required
 # def upload():

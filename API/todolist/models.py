@@ -1,15 +1,7 @@
-# from flask import jsonify
 from todolist import db, login_manager
 from flask_login import UserMixin
 from flask_admin.contrib.sqla import ModelView
-# import bcrypt
-# from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-
-
-# @login_manager.user_loader
-# def load_user(user_id):
-#     return User.query.get(int(user_id))
     
 class User(db.Model, UserMixin):
 
@@ -40,21 +32,6 @@ class User(db.Model, UserMixin):
             return None
         
         return user
-    
-
-    # @property
-    # def password(self):
-    #     return self.password
-    
-    # # sets hashed password
-    # @password.setter
-    # def password(self, unhashed_pw):
-    #     self.password_hash = bcrypt.hashpw(unhashed_pw.encode('utf-8'), bcrypt.gensalt())
-
-    # # checks entered password on login against hashed pw, returns true if correct
-    # def check_password(self, pass_to_check):
-    #     return bcrypt.hashpw(pass_to_check.encode('utf-8'), self.password_hash) == self.password_hash 
-
 
 class Task(db.Model):
 
