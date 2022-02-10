@@ -26,7 +26,6 @@
             class='btn btn-sm btn-outline-info'
             data-bs-toggle='modal'
             :data-bs-target='modalName'
-            @click="prefill(task.id)"
           >Edit</button>
           
           <button 
@@ -114,7 +113,7 @@ export default {
       })
       .then(response => {
         console.log(response)
-        if (response.data.Authenticated) {
+        if (response.data.status == 200) {
           this.newMessage.value = response.data.message
           this.newMessage.color = 'success'
           this.$emit('showMessage', this.newMessage)
@@ -194,26 +193,6 @@ export default {
       // call refreshTasks in parent component (Tasks.vue)
       this.$emit('refreshTasks')
     },
-
-    prefill() {
-      // PREFILL EDIT FIELDS WITH SAVED TASK INFO
-      // Called on launch of edit modal
-      document.getElementById(this.titleInputId).value = this.task.title
-      document.getElementById(this.descInputId).value = this.task.description
-      if (this.task.importance == "danger") {
-        console.log(this.dangBtnId)
-        document.getElementById(this.dangBtnId).setAttribute('checked', true)
-      } else if (this.task.importance == "warning") {
-        document.getElementById(this.warnBtnId).setAttribute('checked', true)
-      } else if (this.task.importance == "secondary") {
-        document.getElementById(this.secBtnId).setAttribute('checked', true)
-      } else {
-        document.getElementById(this.dangBtnId).setAttribute('checked', false)
-        document.getElementById(this.warnBtnId).setAttribute('checked', false)
-        document.getElementById(this.secBtnId).setAttribute('checked', false)
-      }
-    }
-
   },
 
   computed: {

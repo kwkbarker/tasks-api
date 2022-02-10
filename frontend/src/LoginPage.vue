@@ -97,19 +97,13 @@ export default {
         console.log(response)
         const data = response.data
 
-        if (data.Authenticated) {
-          console.log(data.userid)
-          this.$store.commit('tasks/setToken', data.token)
-          this.$store.commit('tasks/setUser', data.userid)
-          this.$store.commit('tasks/setPassword', this.password.value)
-          this.$store.commit('tasks/setUsername', this.username.value)
-          console.log('token: ' + this.$store.state.tasks.token)
-          this.$router.push('/tasks')
-        } else {
-          this.message.value = data.message
-          this.message.color = 'danger'
-        }
-            
+        this.$store.commit('tasks/setToken', data.token)
+        this.$store.commit('tasks/setUser', data.userid)
+        this.$store.commit('tasks/setPassword', this.password.value)
+        this.$store.commit('tasks/setUsername', this.username.value)
+        console.log('token: ' + this.$store.state.tasks.token)
+        this.$router.push('/tasks')
+     
       })
       .catch(err => {
         console.log(err)

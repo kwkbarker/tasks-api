@@ -101,6 +101,31 @@ export default {
     }
   },
 
+  mounted() {
+    if (this.edit) {
+      document.getElementById(this.titleInputId).value = this.task.title
+      this.$emit('update:title', this.task.title)
+
+      document.getElementById(this.descInputId).value = this.task.description
+      this.$emit('update:description', this.task.description)
+
+      if (this.task.importance == "danger") {
+        document.getElementById(this.dangBtnId).setAttribute('checked', true)
+        this.$emit('update:importance', "danger")
+      } else if (this.task.importance == "warning") {
+        document.getElementById(this.warnBtnId).setAttribute('checked', true)
+        this.$emit('update:importance', "warning")
+      } else if (this.task.importance == "secondary") {
+        document.getElementById(this.secBtnId).setAttribute('checked', true)
+        this.$emit('update:importance', "secondary")
+      } else {
+        document.getElementById(this.dangBtnId).setAttribute('checked', false)
+        document.getElementById(this.warnBtnId).setAttribute('checked', false)
+        document.getElementById(this.secBtnId).setAttribute('checked', false)
+      }
+    }
+  },
+
   computed: {
     // compute element IDs to access in methods or within parent component (Task)
     titleInputId() {
